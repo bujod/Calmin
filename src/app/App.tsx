@@ -86,20 +86,72 @@ export default function App() {
     toast.success('Agenda berhasil ditambahkan!');
   };
 
-  const handleSendChatMessage = () => {
+  // FUNGSI CHATBOT DENGAN INTEGRASI GROQ API (UPDATE MODEL)
+  const handleSendChatMessage = async () => {
     if (!chatInput.trim()) return;
     
-    // Tambahkan pesan user
-    setChatMessages(prev => [...prev, { sender: 'user', text: chatInput }]);
+    const userMessage = chatInput;
+    
+    // 1. Tambahkan pesan user ke UI chat
+    setChatMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
     setChatInput("");
     
-    // Simulasi balasan AI
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        sender: 'ai', 
-        text: 'Terima kasih sudah berbagi cerita. Perasaanmu sangat valid, aku di sini untuk mendengarkan dan mendukungmu.' 
-      }]);
-    }, 1000);
+    // 2. Beri indikasi bahwa AI sedang memproses respons
+    setChatMessages(prev => [...prev, { sender: 'ai', text: 'Malie sedang berpikir...' }]);
+    
+    try {
+      // 3. Melakukan HTTP Request ke API Groq
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer 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"
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant", // Model yang baru dan aktif
+          messages: [
+            {
+              role: "system",
+              content: "Kamu adalah Malie, seorang psikolog virtual sekaligus asisten pintar dari aplikasi kesehatan mental Calm.in. Jadilah pendengar yang penuh empati, validasi perasaan pengguna, gunakan bahasa Indonesia yang santun namun bersahabat, ramah, dan berikan dukungan emosional yang menenangkan. Pengguna aplikasi ini bernama Nabil."
+            },
+            {
+              role: "user",
+              content: userMessage
+            }
+          ],
+          temperature: 0.7,
+          stream: false
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Detail Error dari Groq Server:", errorData);
+        throw new Error(`HTTP error! status: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+
+      const data = await response.json();
+      
+      if (data && data.choices && data.choices[0] && data.choices[0].message) {
+        const aiReply = data.choices[0].message.content;
+        
+        // 4. Perbarui teks indikasi loading dengan balasan nyata
+        setChatMessages(prev => [
+          ...prev.slice(0, -1),
+          { sender: 'ai', text: aiReply }
+        ]);
+      } else {
+        throw new Error("Struktur respons JSON tidak sesuai ekspektasi.");
+      }
+
+    } catch (error) {
+      console.error("Gagal mendapatkan respon dari Groq AI:", error);
+      // Jika error, hapus teks loading dan tampilkan pesan kesalahan
+      setChatMessages(prev => [
+        ...prev.slice(0, -1),
+        { sender: 'ai', text: 'Koneksiku ke server sedang terganggu. Bisa tolong kirim kembali pesanmu?' }
+      ]);
+    }
   };
 
   const moods = [
@@ -202,10 +254,8 @@ export default function App() {
       
       <Toaster position="top-center" richColors />
 
-      {/* Tambahkan overflow-auto agar bisa di-scroll jika layar browser lebih kecil dari aplikasi */}
       <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-sans p-4 sm:p-8 overflow-auto">
         
-        {/* Gunakan w-[370px], h-[700px], rounded-[3rem] mutlak, dan tambahkan shrink-0 */}
         <div className="w-[370px] h-[700px] shrink-0 rounded-[3rem] bg-background relative shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800/90 dark:ring-slate-950">
           
           {/* Dynamic Header */}
@@ -241,7 +291,7 @@ export default function App() {
             </header>
           )}
 
-          {/* Scrollable Main Content area. Wrapped with motion.div for tab switching */}
+          {/* Scrollable Main Content area */}
           <main className="flex-1 overflow-y-auto hide-scrollbar pb-32">
             <AnimatePresence mode="wait">
               
@@ -252,9 +302,7 @@ export default function App() {
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}
                   className="flex flex-col"
                 >
-                  {/* Dynamic Header (Scrolls with page) */}
                   <div className="bg-background">
-                    {/* Top Bar */}
                     <div className="flex justify-between items-center px-6 pt-12 pb-4 border-b border-border/50">
                       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                         <h1 className="text-[26px] font-extrabold text-foreground tracking-tight flex items-center gap-2">
@@ -367,7 +415,6 @@ export default function App() {
                         Dominan <span className="text-primary font-bold">Biasa (Neutral)</span> minggu ini.
                       </p>
                       
-                      {/* Grafik Batang Animasi */}
                       <div className="flex justify-between items-end h-24 gap-2 mb-2">
                         {[
                           { day: 'Sen', val: 40, color: 'bg-slate-300 dark:bg-slate-600' },
@@ -392,7 +439,6 @@ export default function App() {
                         ))}
                       </div>
                       
-                      {/* Insight / Saran Otomatis */}
                       <div className="mt-4 bg-secondary/40 dark:bg-secondary/10 p-3.5 rounded-xl border border-border flex gap-2 items-start">
                         <span className="text-base leading-none mt-0.5">💡</span>
                         <p className="text-[11px] text-foreground font-medium leading-relaxed">
@@ -453,7 +499,6 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}
                   className="px-6 pt-6 space-y-6 flex flex-col"
                 >
-                  {/* Banner Ringkasan */}
                   <div className="bg-gradient-to-br from-primary to-blue-950 text-white p-5 rounded-3xl shadow-md relative overflow-hidden">
                     <div className="absolute right-0 bottom-0 opacity-10 translate-x-4 translate-y-4">
                       <Activity size={120} />
@@ -490,7 +535,7 @@ export default function App() {
                     </div>
                   </section>
 
-                  {/* Korelasi Data Fisiologis (Kesehatan Fisik vs Mental) */}
+                  {/* Korelasi Data Fisiologis */}
                   <section className="grid grid-cols-2 gap-4">
                     <div className="bg-card p-4 rounded-3xl border border-border shadow-sm">
                       <div className="flex items-center gap-2 mb-2">
@@ -511,7 +556,6 @@ export default function App() {
                     </div>
                   </section>
 
-                  {/* Analisis Pemicu Mandiri */}
                   <section className="bg-card p-5 rounded-3xl border border-border shadow-sm space-y-3">
                     <h3 className="text-sm font-bold text-foreground">🔍 Analisis Pemicu & Gejala</h3>
                     <div className="space-y-2.5">
@@ -526,7 +570,6 @@ export default function App() {
                     </div>
                   </section>
 
-                  {/* Saran Penanganan Konten */}
                   <section className="bg-card p-5 rounded-3xl border border-border shadow-sm space-y-3">
                     <h3 className="text-sm font-bold text-foreground">🎯 Rekomendasi Langkah Selanjutnya</h3>
                     <ul className="space-y-2 text-xs text-muted-foreground pl-1">
@@ -543,14 +586,13 @@ export default function App() {
                 </motion.div>
               )}
               
-              {/* --- EXPLORE TAB (IG Timeline) --- */}
+              {/* --- EXPLORE TAB --- */}
               {currentTab === 'explore' && (
                 <motion.div 
                   key="explore"
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}
                   className="flex flex-col bg-slate-50 dark:bg-slate-900/50"
                 >
-                  {/* IG-like Stories Row */}
                   <div className="flex gap-4 px-4 py-4 overflow-x-auto hide-scrollbar bg-background border-b border-border">
                     {exploreStories.map(story => (
                       <div 
@@ -566,12 +608,10 @@ export default function App() {
                     ))}
                   </div>
 
-                  {/* Feed Posts */}
                   {explorePosts.map((post) => {
                     const isLiked = likedPosts.includes(post.id);
                     return (
                       <div key={post.id} className="mb-4 bg-background border-b border-border shadow-sm pb-4">
-                        {/* Header */}
                         <div className="flex items-center justify-between p-4">
                           <div className="flex items-center gap-3">
                             <img src={post.avatar} alt={post.user} className="w-10 h-10 rounded-full object-cover ring-2 ring-secondary ring-offset-1" />
@@ -582,9 +622,7 @@ export default function App() {
                           </div>
                           <button onClick={() => toast('Opsi post dibuka')} className="text-muted-foreground hover:text-foreground"><MoreHorizontal size={20} /></button>
                         </div>
-                        {/* Image */}
                         <img src={post.image} alt="Post content" className="w-full aspect-[4/5] object-cover" />
-                        {/* Action Bar */}
                         <div className="p-4 pb-2 flex justify-between items-center">
                           <div className="flex gap-4">
                             <button onClick={() => toggleLike(post.id)} className={`transition-transform active:scale-75 ${isLiked ? 'text-red-500' : 'text-foreground'}`}>
@@ -595,7 +633,6 @@ export default function App() {
                           </div>
                           <button onClick={() => toast.success('Disimpan ke koleksimu')} className="text-foreground hover:text-primary"><Bookmark size={26} /></button>
                         </div>
-                        {/* Caption */}
                         <div className="px-4">
                           <div className="font-bold text-sm mb-1">{isLiked ? post.likes + 1 : post.likes} suka</div>
                           <div className="text-sm text-foreground leading-relaxed">
@@ -609,14 +646,13 @@ export default function App() {
                 </motion.div>
               )}
 
-              {/* --- SCHEDULE TAB (Google Calendar Style) --- */}
+              {/* --- SCHEDULE TAB --- */}
               {currentTab === 'schedule' && (
                 <motion.div 
                   key="schedule"
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}
                   className="flex flex-col h-[calc(100vh-140px)] sm:h-[700px] bg-slate-50 dark:bg-slate-900/50"
                 >
-                  {/* Calendar Header / Date Picker */}
                   <div className="bg-background px-6 py-4 border-b border-border shadow-sm sticky top-0 z-40">
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="font-bold text-foreground text-lg">May 2026</h2>
@@ -624,7 +660,6 @@ export default function App() {
                         <Plus size={16} /> Tambah Agenda
                       </button>
                     </div>
-                    {/* Week row */}
                     <div className="flex justify-between items-center">
                        {[{d: 18, day: 'Sen'}, {d: 19, day: 'Sel'}, {d: 20, day: 'Rab'}, {d: 21, day: 'Kam'}, {d: 22, day: 'Jum'}, {d: 23, day: 'Sab'}, {d: 24, day: 'Min'}].map(item => (
                          <button 
@@ -639,7 +674,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Agenda Timeline List for Selected Date */}
                   <div className="px-6 py-6 flex-1 overflow-y-auto">
                     {agendas.filter(a => a.date === selectedDate).length === 0 ? (
                       <div className="text-center mt-12 text-muted-foreground">
@@ -653,22 +687,18 @@ export default function App() {
                       <div className="space-y-0">
                         {agendas.filter(a => a.date === selectedDate).sort((a,b) => a.time.localeCompare(b.time)).map((agenda, i, arr) => (
                           <div key={agenda.id} className="flex gap-4 relative">
-                            {/* Timeline Connection Line */}
                             {i !== arr.length - 1 && (
                               <div className="absolute top-[28px] bottom-[-28px] left-[59px] w-[2px] bg-border z-0"></div>
                             )}
 
-                            {/* Time */}
                             <div className="w-10 text-right text-[11px] font-extrabold text-muted-foreground pt-1.5">
                               {agenda.time}
                             </div>
                             
-                            {/* Timeline Dot */}
                             <div className="relative flex flex-col items-center pt-2 z-10">
                               <div className={`w-3 h-3 rounded-full outline outline-4 outline-background ${agenda.type === 'session' ? 'bg-primary' : 'bg-blue-400'}`}></div>
                             </div>
 
-                            {/* Agenda Card */}
                             <div className={`flex-1 p-4 mb-4 rounded-3xl border ${agenda.type === 'session' ? 'bg-secondary border-primary/20 text-primary shadow-sm' : 'bg-card border-border shadow-sm text-foreground hover:border-primary/30'} transition-colors`}>
                               <h4 className="font-bold text-sm mb-1">{agenda.title}</h4>
                               <div className="flex items-center gap-2">
@@ -759,7 +789,6 @@ export default function App() {
                 
                 return (
                   <React.Fragment key={item.id}>
-                    {/* Tombol AI Chatbot Mengambang di Tengah */}
                     {index === 2 && (
                       <div className="relative flex items-center justify-center -mt-10 px-2 z-30">
                         <button 
@@ -907,7 +936,6 @@ export default function App() {
               {/* 5. AI Chatbot Flow */}
               {activeModal === 'aiChat' && (
                 <div className="flex flex-col h-[550px] w-full bg-background rounded-3xl overflow-hidden relative">
-                  {/* Chat Header */}
                   <div className="px-6 py-4 border-b border-border flex items-center gap-3 bg-secondary/20 shrink-0">
                     <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
                       <MessageCircle size={20} />
