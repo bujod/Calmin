@@ -29,6 +29,8 @@ import {
   ChevronLeft,
   LogOut,
   Plus,
+  Crown,
+  Check,
 } from "lucide-react";
 
 export default function App() {
@@ -43,6 +45,7 @@ export default function App() {
     | "proHelp"
     | "addAgenda"
     | "aiChat"
+    | "premium"
   >("none");
 
   // States for Depression Detection
@@ -1328,7 +1331,23 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-
+                  <div className="w-full">
+                    <button
+                      onClick={() => setActiveModal("premium")}
+                      className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4 rounded-3xl shadow-lg shadow-orange-500/30 flex items-center justify-between hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                          <Crown size={20} className="text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-bold text-sm">Tingkatkan ke Premium</h3>
+                          <p className="text-[10px] text-white/90 font-medium">Buka semua fitur eksklusif</p>
+                        </div>
+                      </div>
+                      <ChevronRight size={20} className="text-white/80" />
+                    </button>
+                  </div>
                   <div className="w-full bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
                     {[
                       { icon: User, label: "Detail Akun" },
@@ -1754,6 +1773,56 @@ export default function App() {
                       <Send size={18} className="-ml-0.5" />
                     </button>
                   </div>
+                </div>
+              )}
+              {/* 6. Premium Subscription Flow */}
+              {activeModal === "premium" && (
+                <div className="p-6 pt-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
+                      <Crown size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground leading-tight">
+                        Calm.in Premium
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Your mental mate
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-8">
+                    <p className="text-sm text-foreground font-medium leading-relaxed mb-4">
+                      Layanan premium menyediakan akses yang lebih lengkap untuk mendukung kesejahteraanmu, meliputi:
+                    </p>
+                    <ul className="space-y-3">
+                      {[
+                        "Chat tanpa batas dengan Malie (Asisten AI)",
+                        "Integrasi Smartwatch (HRV & Detak Jantung)",
+                        "Evaluasi laporan mingguan mendalam",
+                        "Penjadwalan rutinitas personal tak terbatas",
+                        "Pemesanan tele-counseling tarif khusus pelajar"
+                      ].map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <div className="mt-0.5 w-5 h-5 bg-orange-100 dark:bg-orange-900/30 text-orange-500 rounded-full flex items-center justify-center shrink-0">
+                            <Check size={12} strokeWidth={3} />
+                          </div>
+                          <span className="text-xs font-medium text-muted-foreground leading-relaxed">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      toast.success("Berhasil berlangganan Premium! Selamat menikmati fitur eksklusif.");
+                      setActiveModal("none");
+                    }}
+                    className="w-full py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold rounded-2xl hover:opacity-90 shadow-lg shadow-orange-500/25 transition-all"
+                  >
+                    Mulai Langganan Sekarang
+                  </button>
                 </div>
               )}
             </motion.div>
