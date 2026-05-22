@@ -1787,7 +1787,7 @@ export default function App() {
                         Calm.in Premium
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        Your mental mate
+                        Investasi untuk mentalmu
                       </p>
                     </div>
                   </div>
