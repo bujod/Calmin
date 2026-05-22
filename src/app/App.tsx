@@ -26,6 +26,7 @@ import {
   Settings,
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   LogOut,
   Plus
 } from 'lucide-react';
@@ -200,6 +201,15 @@ export default function App() {
                 </motion.div>
               )}
 
+              {currentTab === 'weekly-detail' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full items-center">
+                  <button onClick={() => setCurrentTab('home')} className="p-2 bg-secondary text-primary rounded-full hover:bg-primary hover:text-white transition-colors mr-3">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <h1 className="text-xl font-bold text-foreground tracking-tight flex-1 text-center pr-10">Detail Evaluasi</h1>
+                </motion.div>
+              )}
+
               {currentTab === 'profile' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full justify-between items-center">
                   <h1 className="text-xl font-bold text-foreground tracking-tight">Profilku</h1>
@@ -288,6 +298,7 @@ export default function App() {
                           </div>
                         </div>
                       </div>
+
                       
                       {/* Indikator Skala */}
                       <div>
@@ -317,6 +328,55 @@ export default function App() {
                         >
                           Mulai Sesi Grounding (2 Menit)
                         </button>
+                      </div>
+                    </div>
+                  </section>
+
+                    {/* Evaluasi Emosi Mingguan */}
+                  <section>
+                    <div className="flex justify-between items-end mb-4">
+                      <h2 className="text-lg font-bold text-foreground">Evaluasi Mingguan</h2>
+                     <button onClick={() => setCurrentTab('weekly-detail')} className="text-[10px] font-bold text-primary bg-secondary px-2 py-1 rounded-lg hover:bg-primary hover:text-white transition-colors">
+                        Lihat Detail
+                      </button>
+                    </div>
+                    
+                    <div className="bg-card p-5 rounded-3xl border border-border shadow-sm hover:border-primary/30 transition-colors">
+                      <p className="text-sm font-medium text-foreground mb-4">
+                        Dominan <span className="text-primary font-bold">Biasa (Neutral)</span> minggu ini.
+                      </p>
+                      
+                      {/* Grafik Batang Animasi */}
+                      <div className="flex justify-between items-end h-24 gap-2 mb-2">
+                        {[
+                          { day: 'Sen', val: 40, color: 'bg-slate-300 dark:bg-slate-600' },
+                          { day: 'Sel', val: 70, color: 'bg-primary/70' },
+                          { day: 'Rab', val: 30, color: 'bg-red-400' },
+                          { day: 'Kam', val: 60, color: 'bg-slate-300 dark:bg-slate-600' },
+                          { day: 'Jum', val: 80, color: 'bg-green-400' },
+                          { day: 'Sab', val: 90, color: 'bg-green-400' },
+                          { day: 'Min', val: 50, color: 'bg-slate-300 dark:bg-slate-600' },
+                        ].map((item, i) => (
+                          <div key={i} className="flex flex-col items-center flex-1 gap-1.5">
+                            <div className="w-full flex items-end justify-center h-20 bg-slate-100 dark:bg-slate-800/50 rounded-md overflow-hidden relative">
+                              <motion.div 
+                                initial={{ height: 0 }} 
+                                animate={{ height: `${item.val}%` }} 
+                                transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                                className={`w-full rounded-md ${item.color}`} 
+                              />
+                            </div>
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase">{item.day}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Insight / Saran Otomatis */}
+                      <div className="mt-4 bg-secondary/40 dark:bg-secondary/10 p-3.5 rounded-xl border border-border flex gap-2 items-start">
+                        <span className="text-base leading-none mt-0.5">💡</span>
+                        <p className="text-[11px] text-foreground font-medium leading-relaxed">
+                          Ada sedikit penurunan mood di hari Rabu. Pastikan kamu mendapat istirahat yang cukup akhir pekan ini ya!
+                        </p>
                       </div>
                     </div>
                   </section>
@@ -365,6 +425,103 @@ export default function App() {
                 </motion.div>
               )}
 
+              {/* --- WEEKLY DETAIL PAGE --- */}
+              {currentTab === 'weekly-detail' && (
+                <motion.div
+                  key="weekly-detail"
+                  initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}
+                  className="px-6 pt-6 space-y-6 flex flex-col"
+                >
+                  {/* Banner Ringkasan */}
+                  <div className="bg-gradient-to-br from-primary to-blue-950 text-white p-5 rounded-3xl shadow-md relative overflow-hidden">
+                    <div className="absolute right-0 bottom-0 opacity-10 translate-x-4 translate-y-4">
+                      <Activity size={120} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md">Periode: 16 - 22 Mei 2026</span>
+                    <h2 className="text-xl font-extrabold mt-2">Kondisi Mental Stabil</h2>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">Secara keseluruhan, kestabilan emosimu minggu ini berada di tingkat yang baik dengan dominasi emosi Biasa (Neutral) dan Baik (Good).</p>
+                  </div>
+
+                  {/* Distribusi Emosi */}
+                  <section className="bg-card p-5 rounded-3xl border border-border shadow-sm space-y-4">
+                    <h3 className="text-sm font-bold text-foreground flex items-center gap-2">📊 Distribusi Emosi</h3>
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Biasa (Neutral)', percentage: 45, count: '3 Hari', color: 'bg-primary' },
+                        { label: 'Baik & Luar Besar', percentage: 35, count: '2 Hari', color: 'bg-green-400' },
+                        { label: 'Sedih & Cemas', percentage: 20, count: '2 Hari', color: 'bg-red-400' },
+                      ].map((mood, idx) => (
+                        <div key={idx} className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-medium text-foreground">
+                            <span>{mood.label}</span>
+                            <span className="text-muted-foreground font-bold">{mood.count} ({mood.percentage}%)</span>
+                          </div>
+                          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }} 
+                              animate={{ width: `${mood.percentage}%` }} 
+                              transition={{ duration: 0.8, delay: idx * 0.1 }}
+                              className={`h-full rounded-full ${mood.color}`} 
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Korelasi Data Fisiologis (Kesehatan Fisik vs Mental) */}
+                  <section className="grid grid-cols-2 gap-4">
+                    <div className="bg-card p-4 rounded-3xl border border-border shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Heart size={16} className="text-orange-500 fill-orange-500" />
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Rata-rata HRV</span>
+                      </div>
+                      <div className="text-xl font-extrabold text-foreground">48 <span className="text-xs font-bold text-muted-foreground">ms</span></div>
+                      <p className="text-[10px] text-orange-600 font-medium mt-1 leading-tight">Mencapai titik terendah pada hari Rabu (Indikasi Stres).</p>
+                    </div>
+
+                    <div className="bg-card p-4 rounded-3xl border border-border shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Activity size={16} className="text-blue-500" />
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Detak Jantung</span>
+                      </div>
+                      <div className="text-xl font-extrabold text-foreground">74 <span className="text-xs font-bold text-muted-foreground">BPM</span></div>
+                      <p className="text-[10px] text-muted-foreground mt-1 leading-tight">Rentang detak jantung istirahat stabil dan normal.</p>
+                    </div>
+                  </section>
+
+                  {/* Analisis Pemicu Mandiri */}
+                  <section className="bg-card p-5 rounded-3xl border border-border shadow-sm space-y-3">
+                    <h3 className="text-sm font-bold text-foreground">🔍 Analisis Pemicu & Gejala</h3>
+                    <div className="space-y-2.5">
+                      <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-2xl border border-red-100 dark:border-red-900/30 text-xs">
+                        <div className="font-bold text-red-700 dark:text-red-400 mb-0.5">Rabu, 20 Mei — Fluktuasi Emosi Tinggi</div>
+                        <p className="text-muted-foreground leading-relaxed">Penurunan HRV tajam terdeteksi selaras dengan isi jurnal harian Anda yang mengindikasikan tekanan beban kerja berlebih.</p>
+                      </div>
+                      <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-2xl border border-green-100 dark:border-green-900/30 text-xs">
+                        <div className="font-bold text-green-700 dark:text-green-400 mb-0.5">Kamis - Jumat — Pemulihan Berhasil</div>
+                        <p className="text-muted-foreground leading-relaxed">Stabilitas emosi kembali naik dipicu oleh aktivitas latihan pernapasan/meditasi malam yang Anda terapkan secara teratur.</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Saran Penanganan Konten */}
+                  <section className="bg-card p-5 rounded-3xl border border-border shadow-sm space-y-3">
+                    <h3 className="text-sm font-bold text-foreground">🎯 Rekomendasi Langkah Selanjutnya</h3>
+                    <ul className="space-y-2 text-xs text-muted-foreground pl-1">
+                      <li className="flex items-start gap-2 leading-relaxed">
+                        <span className="text-primary font-bold">•</span>
+                        <span>Lanjutkan rutinitas meditasi pernapasan malam sebelum jam 21:00 untuk menjaga kesiapan kualitas istirahat.</span>
+                      </li>
+                      <li className="flex items-start gap-2 leading-relaxed">
+                        <span className="text-primary font-bold">•</span>
+                        <span>Jika mendapati kecemasan berulang di tengah minggu, manfaatkan tombol latihan pernapasan kilat untuk menstabilkan kondisi fisik segera.</span>
+                      </li>
+                    </ul>
+                  </section>
+                </motion.div>
+              )}
+              
               {/* --- EXPLORE TAB (IG Timeline) --- */}
               {currentTab === 'explore' && (
                 <motion.div 
@@ -573,7 +730,7 @@ export default function App() {
           <nav className="absolute bottom-0 w-full bg-background/90 backdrop-blur-2xl border-t border-border/50 z-20 pt-3 pb-8 sm:pb-5 px-6">
             <div className="flex justify-between items-center">
               {navItems.map((item) => {
-                const isActive = currentTab === item.id;
+               const isActive = currentTab === item.id || (item.id === 'home' && currentTab === 'weekly-detail');
                 return (
                   <button 
                     key={item.id} 
