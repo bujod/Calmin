@@ -34,7 +34,7 @@ import {
 export default function App() {
   const [currentTab, setCurrentTab] = useState('home');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [activeModal, setActiveModal] = useState<'none' | 'depression' | 'journal' | 'proHelp' | 'addAgenda'>('none');
+  const [activeModal, setActiveModal] = useState<'none' | 'depression' | 'journal' | 'proHelp' | 'addAgenda' | 'aiChat'>('none');
   
   // States for Depression Detection
   const [depressionStep, setDepressionStep] = useState(0);
@@ -42,6 +42,12 @@ export default function App() {
 
   // States for Journal
   const [journalText, setJournalText] = useState("");
+
+  // States for AI Chatbot
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'ai', text: 'Halo Nabil 👋 Aku asisten AI Calm.in. Ada cerita apa yang ingin kamu bagikan hari ini?' }
+  ]);
+  const [chatInput, setChatInput] = useState("");
 
   // States for IG-like Timeline
   const [likedPosts, setLikedPosts] = useState<number[]>([]);
@@ -53,7 +59,7 @@ export default function App() {
     { id: 2, title: 'Meditasi Pernapasan', time: '19:30', type: 'personal', date: 20 },
     { id: 3, title: 'Jurnal Malam', time: '21:00', type: 'personal', date: 20 },
     { id: 4, title: 'Jalan Pagi', time: '06:30', type: 'personal', date: 21 },
-    { id: 5, title: 'Sesi Dr. Budi S.', time: '10:00', type: 'session', date: 22 }, // Selesai
+    { id: 5, title: 'Sesi Dr. Budi S.', time: '10:00', type: 'session', date: 22 },
   ]);
   const [newAgendaTitle, setNewAgendaTitle] = useState('');
   const [newAgendaTime, setNewAgendaTime] = useState('12:00');
@@ -78,6 +84,22 @@ export default function App() {
     setActiveModal('none');
     setNewAgendaTitle('');
     toast.success('Agenda berhasil ditambahkan!');
+  };
+
+  const handleSendChatMessage = () => {
+    if (!chatInput.trim()) return;
+    
+    // Tambahkan pesan user
+    setChatMessages(prev => [...prev, { sender: 'user', text: chatInput }]);
+    setChatInput("");
+    
+    // Simulasi balasan AI
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { 
+        sender: 'ai', 
+        text: 'Terima kasih sudah berbagi cerita. Perasaanmu sangat valid, aku di sini untuk mendengarkan dan mendukungmu.' 
+      }]);
+    }, 1000);
   };
 
   const moods = [
@@ -181,10 +203,10 @@ export default function App() {
       <Toaster position="top-center" richColors />
 
       {/* Tambahkan overflow-auto agar bisa di-scroll jika layar browser lebih kecil dari aplikasi */}
-<div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-sans p-4 sm:p-8 overflow-auto">
-  
-  {/* Gunakan w-[370px], h-[700px], rounded-[3rem] mutlak, dan tambahkan shrink-0 */}
-  <div className="w-[370px] h-[700px] shrink-0 rounded-[3rem] bg-background relative shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800/90 dark:ring-slate-950">
+      <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-sans p-4 sm:p-8 overflow-auto">
+        
+        {/* Gunakan w-[370px], h-[700px], rounded-[3rem] mutlak, dan tambahkan shrink-0 */}
+        <div className="w-[370px] h-[700px] shrink-0 rounded-[3rem] bg-background relative shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800/90 dark:ring-slate-950">
           
           {/* Dynamic Header */}
           {currentTab !== 'home' && (
@@ -276,7 +298,7 @@ export default function App() {
                     </div>
                   </section>
 
-                    {/* HRV (Heart Rate Variability) Status Card */}
+                  {/* HRV (Heart Rate Variability) Status Card */}
                   <section>
                     <div className="flex justify-between items-end mb-4">
                       <h2 className="text-lg font-bold text-foreground">Metrik Stres (HRV)</h2>
@@ -299,7 +321,6 @@ export default function App() {
                         </div>
                       </div>
 
-                      
                       {/* Indikator Skala */}
                       <div>
                         <div className="flex justify-between text-[10px] font-bold text-muted-foreground mb-1.5 uppercase tracking-wider">
@@ -332,7 +353,7 @@ export default function App() {
                     </div>
                   </section>
 
-                    {/* Evaluasi Emosi Mingguan */}
+                  {/* Evaluasi Emosi Mingguan */}
                   <section>
                     <div className="flex justify-between items-end mb-4">
                       <h2 className="text-lg font-bold text-foreground">Evaluasi Mingguan</h2>
@@ -532,7 +553,11 @@ export default function App() {
                   {/* IG-like Stories Row */}
                   <div className="flex gap-4 px-4 py-4 overflow-x-auto hide-scrollbar bg-background border-b border-border">
                     {exploreStories.map(story => (
-                      <div key={story.id} onClick={() => toast(`Membuka cerita dari ${story.user}...`)} className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
+                      <div 
+                        key={story.id} 
+                        onClick={() => toast(`Membuka cerita dari ${story.user}...`)} 
+                        className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                      >
                         <div className={`p-0.5 rounded-full ${story.seen ? 'bg-border' : 'bg-gradient-to-tr from-primary to-blue-400'}`}>
                           <img src={story.avatar} alt={story.user} className="w-[60px] h-[60px] rounded-full border-[3px] border-background object-cover" />
                         </div>
@@ -727,25 +752,38 @@ export default function App() {
           </main>
 
           {/* Bottom Navigation */}
-<nav className="absolute bottom-0 w-full bg-background/90 backdrop-blur-2xl border-t border-border/50 z-20 pt-3 pb-4 sm:pb-2 px-8">
-  <div className="flex justify-between items-center">
-    {navItems.map((item) => {
-      const isActive = currentTab === item.id || (item.id === 'home' && currentTab === 'weekly-detail');
-      return (
-        <button 
-          key={item.id} 
-          onClick={() => setCurrentTab(item.id)}
-          className="flex flex-col items-center justify-center p-2 group"
-        >
-          <div className={`p-2.5 rounded-2xl transition-all duration-300 ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-110' : 'text-muted-foreground group-hover:bg-secondary group-hover:text-primary'}`}>
-            <item.icon size={isActive ? 24 : 22} className={isActive ? 'stroke-[2.5px]' : 'stroke-2'} />
-          </div>
-        </button>
-      );
-    })}
-  </div>
-</nav>
-
+          <nav className="absolute bottom-0 w-full bg-background/90 backdrop-blur-2xl border-t border-border/50 z-20 pt-3 pb-4 sm:pb-2 px-6">
+            <div className="flex justify-between items-center relative w-full">
+              {navItems.map((item, index) => {
+                const isActive = currentTab === item.id || (item.id === 'home' && currentTab === 'weekly-detail');
+                
+                return (
+                  <React.Fragment key={item.id}>
+                    {/* Tombol AI Chatbot Mengambang di Tengah */}
+                    {index === 2 && (
+                      <div className="relative flex items-center justify-center -mt-10 px-2 z-30">
+                        <button 
+                          onClick={() => setActiveModal('aiChat')}
+                          className="w-[60px] h-[60px] bg-primary text-white rounded-full flex items-center justify-center shadow-xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all border-[5px] border-background"
+                        >
+                          <MessageCircle size={28} />
+                        </button>
+                      </div>
+                    )}
+                    
+                    <button 
+                      onClick={() => setCurrentTab(item.id)}
+                      className="flex flex-col items-center justify-center p-2 group"
+                    >
+                      <div className={`p-2.5 rounded-2xl transition-all duration-300 ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-110' : 'text-muted-foreground group-hover:bg-secondary group-hover:text-primary'}`}>
+                        <item.icon size={isActive ? 24 : 22} className={isActive ? 'stroke-[2.5px]' : 'stroke-2'} />
+                      </div>
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </nav>
         </div>
       </div>
 
@@ -865,6 +903,59 @@ export default function App() {
                   </div>
                 </div>
               )}
+
+              {/* 5. AI Chatbot Flow */}
+              {activeModal === 'aiChat' && (
+                <div className="flex flex-col h-[550px] w-full bg-background rounded-3xl overflow-hidden relative">
+                  {/* Chat Header */}
+                  <div className="px-6 py-4 border-b border-border flex items-center gap-3 bg-secondary/20 shrink-0">
+                    <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
+                      <MessageCircle size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground leading-tight">Malie</h3>
+                      <p className="text-[10px] text-primary font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block animate-pulse"></span>
+                        Online
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chat Messages Area */}
+                  <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50 dark:bg-slate-900/10">
+                    {chatMessages.map((msg, idx) => (
+                      <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] p-3.5 text-sm leading-relaxed shadow-sm ${
+                          msg.sender === 'user' 
+                            ? 'bg-primary text-white rounded-2xl rounded-tr-sm' 
+                            : 'bg-white dark:bg-slate-800 border border-border text-foreground rounded-2xl rounded-tl-sm'
+                        }`}>
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Chat Input Area */}
+                  <div className="p-4 bg-background border-t border-border flex gap-2 shrink-0">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSendChatMessage()}
+                      placeholder="Ketik ceritamu di sini..."
+                      className="flex-1 bg-secondary/30 dark:bg-slate-800 border border-transparent rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground font-medium"
+                    />
+                    <button 
+                      onClick={handleSendChatMessage} 
+                      className="w-11 h-11 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary/90 shrink-0 shadow-md transition-transform active:scale-95"
+                    >
+                      <Send size={18} className="-ml-0.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
             </motion.div>
           </motion.div>
         )}
