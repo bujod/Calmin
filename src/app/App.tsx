@@ -188,32 +188,32 @@ export default function App() {
           
           {/* Dynamic Header */}
           {currentTab !== 'home' && (
-            <header className="px-6 pt-12 pb-4 flex justify-between items-center bg-background/95 backdrop-blur-md sticky top-0 z-10 border-b border-border/50">
+            <header className="px-6 pt-6 pb-3 flex justify-between items-center bg-background/95 backdrop-blur-md sticky top-0 z-10 border-b border-border/50">
               {currentTab === 'explore' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 text-center">
-                  <h1 className="text-xl font-bold text-foreground tracking-tight">Eksplorasi</h1>
+                  <h1 className="text-lg font-bold text-foreground tracking-tight">Eksplorasi</h1>
                 </motion.div>
               )}
 
               {currentTab === 'schedule' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 text-center">
-                  <h1 className="text-xl font-bold text-foreground tracking-tight">Jadwal</h1>
+                  <h1 className="text-lg font-bold text-foreground tracking-tight">Jadwal</h1>
                 </motion.div>
               )}
 
               {currentTab === 'weekly-detail' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full items-center">
-                  <button onClick={() => setCurrentTab('home')} className="p-2 bg-secondary text-primary rounded-full hover:bg-primary hover:text-white transition-colors mr-3">
+                  <button onClick={() => setCurrentTab('home')} className="p-1.5 bg-secondary text-primary rounded-full hover:bg-primary hover:text-white transition-colors mr-3">
                     <ChevronLeft size={18} />
                   </button>
-                  <h1 className="text-xl font-bold text-foreground tracking-tight flex-1 text-center pr-10">Detail Evaluasi</h1>
+                  <h1 className="text-lg font-bold text-foreground tracking-tight flex-1 text-center pr-8">Detail Evaluasi</h1>
                 </motion.div>
               )}
 
               {currentTab === 'profile' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full justify-between items-center">
-                  <h1 className="text-xl font-bold text-foreground tracking-tight">Profilku</h1>
-                  <button onClick={() => toast('Membuka pengaturan aplikasi...')} className="p-2 bg-secondary text-primary rounded-full"><Settings size={20} /></button>
+                  <h1 className="text-lg font-bold text-foreground tracking-tight">Profilku</h1>
+                  <button onClick={() => toast('Membuka pengaturan aplikasi...')} className="p-1.5 bg-secondary text-primary rounded-full"><Settings size={18} /></button>
                 </motion.div>
               )}
             </header>
@@ -727,27 +727,24 @@ export default function App() {
           </main>
 
           {/* Bottom Navigation */}
-          <nav className="absolute bottom-0 w-full bg-background/90 backdrop-blur-2xl border-t border-border/50 z-20 pt-3 pb-8 sm:pb-5 px-6">
-            <div className="flex justify-between items-center">
-              {navItems.map((item) => {
-               const isActive = currentTab === item.id || (item.id === 'home' && currentTab === 'weekly-detail');
-                return (
-                  <button 
-                    key={item.id} 
-                    onClick={() => setCurrentTab(item.id)}
-                    className="flex flex-col items-center gap-1.5 p-2 w-16 group"
-                  >
-                    <div className={`p-2.5 rounded-2xl transition-all duration-300 ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-110' : 'text-muted-foreground group-hover:bg-secondary group-hover:text-primary'}`}>
-                      <item.icon size={isActive ? 22 : 20} className={isActive ? 'stroke-[2.5px]' : 'stroke-2'} />
-                    </div>
-                    <span className={`text-[10px] font-bold transition-all ${isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>
-                      {item.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
+<nav className="absolute bottom-0 w-full bg-background/90 backdrop-blur-2xl border-t border-border/50 z-20 pt-3 pb-4 sm:pb-2 px-8">
+  <div className="flex justify-between items-center">
+    {navItems.map((item) => {
+      const isActive = currentTab === item.id || (item.id === 'home' && currentTab === 'weekly-detail');
+      return (
+        <button 
+          key={item.id} 
+          onClick={() => setCurrentTab(item.id)}
+          className="flex flex-col items-center justify-center p-2 group"
+        >
+          <div className={`p-2.5 rounded-2xl transition-all duration-300 ${isActive ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-110' : 'text-muted-foreground group-hover:bg-secondary group-hover:text-primary'}`}>
+            <item.icon size={isActive ? 24 : 22} className={isActive ? 'stroke-[2.5px]' : 'stroke-2'} />
+          </div>
+        </button>
+      );
+    })}
+  </div>
+</nav>
 
         </div>
       </div>
