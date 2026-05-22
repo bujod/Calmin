@@ -89,7 +89,7 @@ export default function App() {
 
   const features = [
     { id: 'detect', icon: Activity, title: 'Deteksi Depresi', desc: 'Cek kondisimu', action: () => { setActiveModal('depression'); setDepressionStep(0); } },
-    { id: 'journal', icon: BookOpen, title: 'Jurnal', desc: 'Tulis perasaanmu', action: () => setActiveModal('journal') },
+    { id: 'journal', icon: BookOpen, title: 'Jurnal', desc: 'Ceritakan harimu disini', action: () => setActiveModal('journal') },
     { id: 'proHelp', icon: HeartHandshake, title: 'Psikolog', desc: 'Bantuan profesional', action: () => setActiveModal('proHelp') },
     { id: 'meditate', icon: Wind, title: 'Meditasi', desc: 'Relaksasi pikiran', action: () => toast('Memulai sesi Meditasi...', { icon: '🧘' }) },
   ];
@@ -103,14 +103,14 @@ export default function App() {
     { id: 1, user: 'Dr. Amanda', avatar: proDoctors[0].image, seen: false },
     { id: 2, user: 'Calm.in', avatar: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=100&auto=format&fit=crop", seen: false },
     { id: 3, user: 'Dr. Budi', avatar: proDoctors[1].image, seen: true },
-    { id: 4, user: 'Cerita', avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop", seen: true },
+    { id: 4, user: 'Cerita Ment..', avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop", seen: true },
     { id: 5, user: 'Zen', avatar: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=100&auto=format&fit=crop", seen: true },
   ];
 
   const explorePosts = [
     {
       id: 1,
-      user: "Dr. Amanda L.",
+      user: "Dr. Amanda",
       avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=100&auto=format&fit=crop",
       time: "2 jam yang lalu",
       image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop",
@@ -119,7 +119,7 @@ export default function App() {
     },
     {
       id: 2,
-      user: "Calm.in Official",
+      user: "Calm.in",
       avatar: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=100&auto=format&fit=crop",
       time: "5 jam yang lalu",
       image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?q=80&w=600&auto=format&fit=crop",
@@ -182,8 +182,8 @@ export default function App() {
       {/* Tambahkan overflow-auto agar bisa di-scroll jika layar browser lebih kecil dari aplikasi */}
 <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-sans p-4 sm:p-8 overflow-auto">
   
-  {/* Gunakan w-[400px], h-[850px], rounded-[3rem] mutlak, dan tambahkan shrink-0 */}
-  <div className="w-[400px] h-[850px] shrink-0 rounded-[3rem] bg-background relative shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800/90 dark:ring-slate-950">
+  {/* Gunakan w-[370px], h-[700px], rounded-[3rem] mutlak, dan tambahkan shrink-0 */}
+  <div className="w-[370px] h-[700px] shrink-0 rounded-[3rem] bg-background relative shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800/90 dark:ring-slate-950">
           
           {/* Dynamic Header */}
           {currentTab !== 'home' && (
@@ -266,6 +266,61 @@ export default function App() {
                     </div>
                   </section>
 
+                    {/* HRV (Heart Rate Variability) Status Card */}
+                  <section>
+                    <div className="flex justify-between items-end mb-4">
+                      <h2 className="text-lg font-bold text-foreground">Metrik Stres (HRV)</h2>
+                      <span className="text-[10px] font-bold text-primary bg-secondary px-2 py-1 rounded-lg flex items-center gap-1">
+                        <Activity size={12} /> Smartwatch Terhubung
+                      </span>
+                    </div>
+                    
+                    <div className="bg-card p-5 rounded-3xl border border-border shadow-sm flex flex-col gap-4 hover:border-primary/30 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 text-orange-500 rounded-2xl flex items-center justify-center shrink-0">
+                          <Heart size={24} className="fill-current" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-sm text-foreground">Variabilitas Detak Jantung</h3>
+                          <div className="flex items-end gap-1 mt-0.5">
+                            <span className="text-2xl font-extrabold text-foreground leading-none">42</span>
+                            <span className="text-xs font-bold text-muted-foreground mb-0.5">ms</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Indikator Skala */}
+                      <div>
+                        <div className="flex justify-between text-[10px] font-bold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                          <span>Stres Tinggi</span>
+                          <span>Rileks</span>
+                        </div>
+                        <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden relative">
+                          <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 w-full opacity-20"></div>
+                          <motion.div 
+                            initial={{ width: 0 }} 
+                            animate={{ width: '42%' }} 
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="bg-orange-500 h-full rounded-full relative z-10 shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Konteks Psikologis */}
+                      <div className="bg-orange-50 dark:bg-orange-900/10 p-3.5 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                        <p className="text-xs text-orange-800 dark:text-orange-300 font-medium leading-relaxed">
+                          <span className="font-bold text-orange-600 dark:text-orange-400">Peringatan Sistem:</span> Skor HRV kamu saat ini lebih rendah dari rata-rata normal (65 ms). Ini adalah indikasi kuat bahwa sistem saraf simpatikmu sedang aktif (tubuh dalam kondisi stres, cemas, atau kelelahan).
+                        </p>
+                        <button 
+                          onClick={() => toast('Memulai sesi relaksasi pernapasan...')} 
+                          className="mt-2.5 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 transition-colors"
+                        >
+                          Mulai Sesi Grounding (2 Menit)
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+                    
                   {/* Daily Affirmation Card */}
                   <section>
                     <div className="bg-primary text-primary-foreground rounded-3xl p-6 relative overflow-hidden shadow-xl shadow-primary/20">
@@ -627,7 +682,7 @@ export default function App() {
                 <div className="p-6 pt-10">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 bg-secondary text-primary rounded-xl flex items-center justify-center"><BookOpen size={20} /></div>
-                    <div><h3 className="text-lg font-bold text-foreground leading-tight">Jurnal Harian</h3><p className="text-xs text-muted-foreground">Apa yang kamu pikirkan saat ini?</p></div>
+                    <div><h3 className="text-lg font-bold text-foreground leading-tight">Jurnal</h3><p className="text-xs text-muted-foreground">Apa yang kamu pikirkan saat ini?</p></div>
                   </div>
                   <textarea value={journalText} onChange={(e) => setJournalText(e.target.value)} placeholder="Ceritakan harimu dengan jujur di sini..." className="w-full h-40 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>
                   <button onClick={() => { setActiveModal('none'); setJournalText(''); toast.success('Jurnal berhasil disimpan! Kamu hebat.'); }} className="w-full py-3.5 mt-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 flex items-center justify-center gap-2"><PenTool size={18} /> Simpan Jurnal</button>
