@@ -123,9 +123,9 @@ export default function App() {
   ];
 
   const exploreStories = [
-    { id: 1, user: 'Dr. Amanda', avatar: proDoctors[0].image, seen: false },
+    { id: 1, user: 'Nafisa', avatar: "https://i.imgur.com/Q7j28cY.jpeg", seen: false },
     { id: 2, user: 'Calm.in', avatar: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=100&auto=format&fit=crop", seen: false },
-    { id: 3, user: 'Dr. Budi', avatar: proDoctors[1].image, seen: true },
+    { id: 3, user: 'Ryan', avatar: "https://i.imgur.com/pnbJFwk.png", seen: true },
     { id: 4, user: 'Cerita Ment..', avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop", seen: true },
     { id: 5, user: 'Zen', avatar: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=100&auto=format&fit=crop", seen: true },
   ];
