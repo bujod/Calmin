@@ -41,6 +41,9 @@ import {
   Clock,
 } from "lucide-react";
 
+// Import komponen Kalender dari UI kit bawaan
+import { Calendar as CalendarUI } from "./components/ui/calendar";
+
 // Komponen utilitas untuk mengembalikan posisi scroll ke tempat terakhir
 const ScrollRestorer = ({
   tabKey,
@@ -55,7 +58,6 @@ const ScrollRestorer = ({
 }) => {
   useLayoutEffect(() => {
     if (scrollRef.current) {
-      // Kembalikan ke posisi terakhir, jika tidak ada (baru pertama buka), mulai dari 0
       scrollRef.current.scrollTop =
         scrollPositions.current[tabKey] || 0;
     }
@@ -69,7 +71,7 @@ export default function App() {
     string | null
   >(null);
 
-  // Penambahan tipe modal untuk notifikasi, story, dan post options
+  // Penambahan tipe modal untuk notifikasi, story, post options, dan fullCalendar
   const [activeModal, setActiveModal] = useState<
     | "none"
     | "depression"
@@ -81,6 +83,7 @@ export default function App() {
     | "notifications"
     | "story"
     | "postOptions"
+    | "fullCalendar"
   >("none");
 
   // State dan Refs untuk Memory Scroll Position
@@ -88,7 +91,6 @@ export default function App() {
   const scrollRef = useRef<HTMLElement>(null);
 
   const handleTabChange = (newTab: string) => {
-    // Simpan posisi scroll sebelum berpindah tab
     if (scrollRef.current) {
       scrollPositions.current[currentTab] =
         scrollRef.current.scrollTop;
@@ -155,47 +157,78 @@ export default function App() {
   const [activePostForOptions, setActivePostForOptions] =
     useState<number | null>(null);
 
-  // States for Schedule (Calendar View)
-  const [selectedDate, setSelectedDate] = useState(14);
+  // States untuk Kalender Utama (Menggunakan objek Date)
+  const [selectedDate, setSelectedDate] = useState<Date>(
+    new Date(2026, 4, 20),
+  ); // Default: 20 Mei 2026
+
+  // Menggunakan format string standar YYYY-MM-DD
   const [agendas, setAgendas] = useState([
     {
       id: 1,
       title: "Sesi Dr. Amanda L.",
       time: "14:00",
       type: "session",
-      date: 20,
+      date: "2026-05-20",
     },
     {
       id: 2,
       title: "Meditasi Pernapasan",
       time: "19:30",
       type: "personal",
-      date: 20,
+      date: "2026-05-20",
     },
     {
       id: 3,
       title: "Jurnal Malam",
       time: "21:00",
       type: "personal",
-      date: 20,
+      date: "2026-05-20",
     },
     {
       id: 4,
       title: "Jalan Pagi",
       time: "06:30",
       type: "personal",
-      date: 21,
+      date: "2026-05-21",
     },
     {
       id: 5,
       title: "Sesi Dr. Budi S.",
       time: "10:00",
       type: "session",
-      date: 22,
+      date: "2026-05-22",
     },
   ]);
   const [newAgendaTitle, setNewAgendaTitle] = useState("");
+
+  // Default string menggunakan format 24 jam (HH:mm)
   const [newAgendaTime, setNewAgendaTime] = useState("12:00");
+
+  // Fungsi utilitas pembantu kalender
+  const getFormattedDateStr = (date: Date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+
+  const getWeekDays = (baseDate: Date) => {
+    const days = [];
+    for (let i = -3; i <= 3; i++) {
+      const d = new Date(baseDate);
+      d.setDate(baseDate.getDate() + i);
+      days.push(d);
+    }
+    return days;
+  };
+
+  const daysOfWeek = [
+    "Min",
+    "Sen",
+    "Sel",
+    "Rab",
+    "Kam",
+    "Jum",
+    "Sab",
+  ];
 
   const toggleLike = (postId: number) => {
     if (likedPosts.includes(postId)) {
@@ -214,11 +247,12 @@ export default function App() {
         title: newAgendaTitle,
         time: newAgendaTime,
         type: "personal",
-        date: selectedDate,
+        date: getFormattedDateStr(selectedDate),
       },
     ]);
     setActiveModal("none");
     setNewAgendaTitle("");
+    setNewAgendaTime("12:00");
     toast.success("Agenda berhasil ditambahkan!");
   };
 
@@ -390,7 +424,6 @@ export default function App() {
     },
   ];
 
-  // Penambahan data gambar content untuk story 24 jam
   const exploreStories = [
     {
       id: 1,
@@ -494,16 +527,15 @@ export default function App() {
 
   const handleDetectionAnswer = (isDepressed: boolean) => {
     if (isDepressed) {
-      setDepressionStep(1); // Detected!
+      setDepressionStep(1);
       setTimeout(() => {
-        setIsCalling(true); // Auto call
+        setIsCalling(true);
       }, 1500);
     } else {
-      setActiveModal("none"); // Close if fine
+      setActiveModal("none");
     }
   };
 
-  // Hitung jumlah notifikasi yang tertunda (belum dibaca/direspon)
   const unreadNotificationsCount =
     notifications.filter(
       (n) => n.type === "connection" && n.status === "pending",
@@ -1324,9 +1356,22 @@ export default function App() {
 
                   <div className="bg-background px-6 py-4 border-b border-border shadow-sm sticky top-0 z-40">
                     <div className="flex justify-between items-center mb-6">
-                      <h2 className="font-bold text-foreground text-lg">
-                        Mei 2026
-                      </h2>
+                      {/* Klik nama bulan untuk membuka pemilih tanggal penuh */}
+                      <button
+                        onClick={() =>
+                          setActiveModal("fullCalendar")
+                        }
+                        className="flex items-center gap-2 font-bold text-foreground text-lg hover:text-primary transition-all group"
+                      >
+                        {selectedDate.toLocaleDateString(
+                          "id-ID",
+                          { month: "long", year: "numeric" },
+                        )}
+                        <Calendar
+                          size={18}
+                          className="text-primary group-hover:scale-110 transition-transform"
+                        />
+                      </button>
                       <button
                         onClick={() =>
                           setActiveModal("addAgenda")
@@ -1336,37 +1381,39 @@ export default function App() {
                         <Plus size={16} /> Tambah Agenda
                       </button>
                     </div>
-                    <div className="flex justify-between items-center">
-                      {[
-                        { d: 18, day: "Sen" },
-                        { d: 19, day: "Sel" },
-                        { d: 20, day: "Rab" },
-                        { d: 21, day: "Kam" },
-                        { d: 22, day: "Jum" },
-                        { d: 23, day: "Sab" },
-                        { d: 24, day: "Min" },
-                      ].map((item) => (
-                        <button
-                          key={item.d}
-                          onClick={() =>
-                            setSelectedDate(item.d)
-                          }
-                          className={`flex flex-col items-center p-2.5 rounded-2xl w-[45px] transition-colors ${selectedDate === item.d ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-muted-foreground hover:bg-secondary"}`}
-                        >
-                          <span className="text-[10px] font-bold mb-1 uppercase">
-                            {item.day}
-                          </span>
-                          <span className="text-sm font-extrabold">
-                            {item.d}
-                          </span>
-                        </button>
-                      ))}
+                    {/* Slider Mingguan Dinamis Berdasarkan Tanggal Terpilih */}
+                    <div className="flex justify-between items-center gap-2 overflow-x-auto hide-scrollbar">
+                      {getWeekDays(selectedDate).map(
+                        (dayDate) => {
+                          const isSelected =
+                            dayDate.toDateString() ===
+                            selectedDate.toDateString();
+                          return (
+                            <button
+                              key={dayDate.toISOString()}
+                              onClick={() =>
+                                setSelectedDate(dayDate)
+                              }
+                              className={`flex flex-col items-center shrink-0 p-2.5 rounded-2xl w-[45px] transition-colors ${isSelected ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-muted-foreground hover:bg-secondary"}`}
+                            >
+                              <span className="text-[10px] font-bold mb-1 uppercase">
+                                {daysOfWeek[dayDate.getDay()]}
+                              </span>
+                              <span className="text-sm font-extrabold">
+                                {dayDate.getDate()}
+                              </span>
+                            </button>
+                          );
+                        },
+                      )}
                     </div>
                   </div>
 
                   <div className="px-6 py-6 flex-1 overflow-y-auto">
                     {agendas.filter(
-                      (a) => a.date === selectedDate,
+                      (a) =>
+                        a.date ===
+                        getFormattedDateStr(selectedDate),
                     ).length === 0 ? (
                       <div className="text-center mt-12 text-muted-foreground">
                         <div className="w-16 h-16 bg-secondary text-primary/50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1384,7 +1431,9 @@ export default function App() {
                       <div className="space-y-0">
                         {agendas
                           .filter(
-                            (a) => a.date === selectedDate,
+                            (a) =>
+                              a.date ===
+                              getFormattedDateStr(selectedDate),
                           )
                           .sort((a, b) =>
                             a.time.localeCompare(b.time),
@@ -1470,24 +1519,40 @@ export default function App() {
                     </p>
                   </div>
 
-                  {/* Statistik Profil Sosial */}
+                  {/* Statistik Profil Sosial (Bisa diklik dengan motion.button) */}
                   <div className="grid grid-cols-2 gap-4 w-full">
-                    <div className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm">
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() =>
+                        toast(
+                          "Membuka riwayat unggahan Anda...",
+                        )
+                      }
+                      className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm hover:border-primary/30 transition-colors flex flex-col items-center justify-center"
+                    >
                       <div className="text-xl font-bold text-primary">
                         2
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-wider">
                         Unggahan
                       </div>
-                    </div>
-                    <div className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm">
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() =>
+                        toast("Membuka daftar koneksi Anda...")
+                      }
+                      className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm hover:border-primary/30 transition-colors flex flex-col items-center justify-center"
+                    >
                       <div className="text-xl font-bold text-primary">
                         9
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-wider">
                         Koneksi
                       </div>
-                    </div>
+                    </motion.button>
                   </div>
 
                   <div className="w-full">
@@ -1741,7 +1806,7 @@ export default function App() {
                   </button>
                 )}
 
-              {/* 1. Add Agenda Flow */}
+              {/* 1. Add Agenda Flow (Waktu Menggunakan Format Terpaksa 24 Jam Native) */}
               {activeModal === "addAgenda" && (
                 <div className="p-6 pt-10">
                   <div className="flex items-center gap-3 mb-6">
@@ -1775,15 +1840,17 @@ export default function App() {
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-                        Waktu
+                        Waktu (Format 24 Jam)
                       </label>
+                      {/* Atribut khusus ditambahkan untuk memaksa browser memprioritaskan visual 24 jam */}
                       <input
                         type="time"
                         value={newAgendaTime}
+                        step="60"
                         onChange={(e) =>
                           setNewAgendaTime(e.target.value)
                         }
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary font-medium [color-scheme:light]"
                       />
                     </div>
 
@@ -2088,13 +2155,13 @@ export default function App() {
                   <button
                     onClick={() => {
                       toast.success(
-                        "Berhasil berlangganan Premium! Selamat menikmati fitur eksklusif.",
+                        "Berlangganan premium berhasil dikonfirmasi!",
                       );
                       setActiveModal("none");
                     }}
                     className="w-full py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold rounded-2xl hover:opacity-90 shadow-lg shadow-orange-500/25 transition-all"
                   >
-                    Premium Aktif
+                    Premium Premium Aktif
                   </button>
                 </div>
               )}
@@ -2157,7 +2224,6 @@ export default function App() {
                               {notif.message}
                             </p>
 
-                            {/* Tombol aksi khusus untuk koneksi */}
                             {notif.type === "connection" &&
                               notif.status === "pending" && (
                                 <div className="flex gap-2 mt-3">
@@ -2208,7 +2274,6 @@ export default function App() {
               {/* 8. Story 24 Jam Flow */}
               {activeModal === "story" && activeStory && (
                 <div className="w-full h-full bg-black relative flex flex-col">
-                  {/* Progress bar and Header */}
                   <div className="absolute top-0 left-0 w-full p-4 z-10 flex flex-col gap-2 bg-gradient-to-b from-black/60 to-transparent">
                     <div className="flex gap-1">
                       <div className="h-1 bg-white/30 rounded-full flex-1 overflow-hidden">
@@ -2248,14 +2313,12 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Image Content */}
                   <img
                     src={activeStory.content}
                     className="w-full h-full object-cover"
                     alt="Story"
                   />
 
-                  {/* Interaction Bottom */}
                   <div className="absolute bottom-0 w-full p-4 z-10 flex items-center gap-3 bg-gradient-to-t from-black/60 to-transparent">
                     <input
                       type="text"
@@ -2346,6 +2409,32 @@ export default function App() {
                         Laporkan Postingan
                       </button>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 10. Pemilih Tanggal Lengkap (Full Calendar Picker Flow) */}
+              {activeModal === "fullCalendar" && (
+                <div className="p-6 pt-10 flex flex-col items-center">
+                  <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6"></div>
+                  <h3 className="text-base font-bold text-foreground mb-4">
+                    Pilih Tanggal Utama
+                  </h3>
+                  <div className="bg-card border border-border rounded-2xl shadow-sm p-2 w-full flex justify-center">
+                    <CalendarUI
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          setSelectedDate(date);
+                          setActiveModal("none");
+                          toast.success(
+                            `Tanggal dipindahkan ke ${date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`,
+                          );
+                        }
+                      }}
+                      className="w-full"
+                    />
                   </div>
                 </div>
               )}
