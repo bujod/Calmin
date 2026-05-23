@@ -575,7 +575,7 @@ export default function App() {
                     <section>
                       <div className="flex justify-between items-end mb-4">
                         <h2 className="text-lg font-bold text-foreground">
-                          Metrik Stres (HRV)
+                          Metrik Stres
                         </h2>
                         <span className="text-[10px] font-bold text-primary bg-secondary px-2 py-1 rounded-lg flex items-center gap-1">
                           <Activity size={12} /> Smartwatch Terhubung
@@ -965,7 +965,7 @@ export default function App() {
                   
                   <div className="bg-background px-6 py-4 border-b border-border shadow-sm sticky top-0 z-40">
                     <div className="flex justify-between items-center mb-6">
-                      <h2 className="font-bold text-foreground text-lg">May 2026</h2>
+                      <h2 className="font-bold text-foreground text-lg">Mei 2026</h2>
                       <button onClick={() => setActiveModal("addAgenda")} className="py-2 px-4 bg-primary text-white rounded-full shadow-md hover:bg-primary/90 flex items-center gap-1.5 text-xs font-bold transition-all">
                         <Plus size={16} /> Tambah Agenda
                       </button>
@@ -1070,7 +1070,7 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4 w-full">
                     <div className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm">
                       <div className="text-xl font-bold text-primary">24</div>
-                      <div className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-wider">Posts</div>
+                      <div className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-wider">Unggahan</div>
                     </div>
                     <div className="bg-card p-4 rounded-3xl text-center border border-border shadow-sm">
                       <div className="text-xl font-bold text-primary">128</div>
@@ -1099,7 +1099,7 @@ export default function App() {
                     {[
                       { icon: User, label: "Detail Akun", id: "account-detail" },
                       { icon: Activity, label: "Laporan Mental", id: "report" },
-                      { icon: Bookmark, label: "Post Disimpan", id: "saved" },
+                      { icon: Bookmark, label: "Unggahan Disimpan", id: "saved" },
                       { icon: MessageCircle, label: "Bantuan & Dukungan", id: "support" },
                     ].map((item, i) => (
                       <button
