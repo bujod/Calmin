@@ -401,7 +401,7 @@ export default function App() {
       id: "meditate",
       icon: Wind,
       title: "Meditasi",
-      desc: "Relaksasi pikiran",
+      desc: "Relaksasi pikiranmu",
       action: () =>
         toast("Memulai sesi Meditasi...", { icon: "🧘" }),
     },
@@ -810,7 +810,7 @@ export default function App() {
                             }
                             className="mt-2.5 w-full py-2 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 transition-colors"
                           >
-                            Mulai Sesi Grounding (2 Menit)
+                            Mulai Sesi Grounding
                           </button>
                         </div>
                       </div>
