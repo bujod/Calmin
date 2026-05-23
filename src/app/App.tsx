@@ -1341,8 +1341,8 @@ export default function App() {
                           <Crown size={20} className="text-white" />
                         </div>
                         <div className="text-left">
-                          <h3 className="font-bold text-sm">Tingkatkan ke Premium</h3>
-                          <p className="text-[10px] text-white/90 font-medium">Buka semua fitur eksklusif</p>
+                          <h3 className="font-bold text-sm">Premium Aktif</h3>
+                          <p className="text-[10px] text-white/90 font-medium">Semua fitur eksklusif terbuka</p>
                         </div>
                       </div>
                       <ChevronRight size={20} className="text-white/80" />
@@ -1821,7 +1821,7 @@ export default function App() {
                     }}
                     className="w-full py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold rounded-2xl hover:opacity-90 shadow-lg shadow-orange-500/25 transition-all"
                   >
-                    Mulai Langganan Sekarang
+                    Premium Aktif
                   </button>
                 </div>
               )}
