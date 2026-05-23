@@ -39,6 +39,7 @@ import {
   Flag,
   UserPlus,
   Clock,
+  
 } from "lucide-react";
 
 // Import komponen Kalender dari UI kit bawaan
@@ -2155,7 +2156,7 @@ export default function App() {
                   <button
                     onClick={() => {
                       toast.success(
-                        "Berlangganan premium berhasil dikonfirmasi!",
+                        "Premium sudah aktif!",
                       );
                       setActiveModal("none");
                     }}
